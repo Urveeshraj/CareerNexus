@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerNexus - Resume Analyzer</title>
+    <style>
+        /* General body styling */
+body {
+    /* background-color: #EEE3CB; */
+    background-image: url('https://img.freepik.com/premium-photo/modern-digital-marketing-banner-with-iconfilled-blue-background_952286-2531.jpg');
+    background-repeat: no-repeat; /* Prevents repetition */
+    background-position: center center; /* Centers the image */
+    background-size: cover; /* Ensures the image covers the entire viewport */
+    background-attachment: fixed; 
+    font-family: Arial, sans-serif;
+    text-align: center;
+    color: #5A3E36; /* Darker shade for better readability */
+    margin: 0;
+    padding: 20px;
+}
+
+
+
+/* Container for form and results */
+.container {
+    background: #D7C0AE;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 50px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Adds subtle depth */
+    max-width: 600px;
+    width: 90%;
+}
+
+/* Improve button styles */
+button {
+    background: #9BABB8;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover effect for button */
+button:hover {
+    background: #7B8E9F; /* Slightly darker blue */
+    transform: scale(1.07); /* Slight scaling effect */
+}
+
+/* Input field styling */
+input[type="file"] {
+    padding: 10px;
+    border: 2px solid #967E76;
+    border-radius: 5px;
+    background: #EEE3CB;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, border 0.3s ease-in-out;
+}
+
+/* Input field hover effect */
+input[type="file"]:hover {
+    background: #E0D3C0;
+    border-color: #5A3E36;
+}
+
+/* Typography improvements */
+h1 {
+    color: #5A3E36;
+    font-size: 26px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Subtitles */
+h2, h3 {
+    color: #5A3E36;
+    font-size: 20px;
+}
+
+/* Text hover effect */
+h1, h2, h3, p {
+    transition: color 0.3s ease-in-out;
+}
+
+/* Darken text on hover */
+h1:hover, h2:hover, h3:hover, p:hover {
+    color: #3E2C28;
+}
+
+/* Improve list styling */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background: #EEE3CB;
+    margin: 5px 0;
+    padding: 8px;
+    border-radius: 5px;
+    transition: background 0.3s ease-in-out;
+}
+
+/* List hover effect */
+li:hover {
+    background: #E0D3C0;
+}
+
+/* Warning message for low match scores */
+.warning {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Improve link visibility */
+a {
+    color: #5A3E36;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+}
+
+/* Link hover effect */
+a:hover {
+    color: #3E2C28;
+    text-decoration: underline;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CareerNexus - Resume Analyzer</h1>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="file" id="resumeFile" required>
+            <button type="submit">Upload Resume</button>
+        </form>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        document.getElementById("uploadForm").onsubmit = async function(event) {
+            event.preventDefault();
+            let formData = new FormData();
+            formData.append("file", document.getElementById("resumeFile").files[0]);
+
+            let response = await fetch("/upload", { method: "POST", body: formData });
+            let data = await response.json();
+
+            let resultsDiv = document.getElementById("results");
+            // resultsDiv.innerHTML = `<h2>Extracted Skills: ${data.skills}</h2>`;
+            resultsDiv.innerHTML += `<h2>Resume/CV uploaded successfully.</h2>`;
+            // resultsDiv.innerHTML += `<h2>Scores for respective Job Match: ${data.scores.toFixed(4)})</h2>`;
+            resultsDiv.innerHTML = `<h3>Job Compatibility Scores:</h3>
+                <ul>
+                    ${Object.entries(data.scores).map(([job, score]) => `<li>${job}: ${score.toFixed(4)}</li>`).join("")}
+                </ul>`;
+            resultsDiv.innerHTML += `<h2>Best Job Match: ${data.best_match} (Score Out of 1: ${data.best_match_score.toFixed(4)})</h2>`;
+            if (data.best_match_score < 0.5) {
+    resultsDiv.innerHTML += `<p class="warning">Since job matching is below 50%, consider revising your resume to highlight relevant skills.</p>`;
+}
+
+        };
+    </script>
+</body>
+</html>
